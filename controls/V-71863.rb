@@ -2,9 +2,8 @@
 #
 
 #TODO: Make sure this is actually an onlyif on the GUI - ssh banner, ftp banner also use /etc/issue
-
 banner_message_text_cli = attribute('banner_message_text_cli',
-value:
+value: 
 "You are accessing a U.S. Government (USG) Information System (IS) that is \
 provided for USG-authorized use only. By using this IS (which includes any \
 device attached to this IS), you consent to the following conditions: -The USG \
@@ -174,6 +173,7 @@ Agreement for details.\""
   end if banner_missing
 
   banner_message = banner_file.content.gsub(%r{[\r\n\s]}, '')
+  banner_message = banner_message.gsub(%r{Lastlogin(.)+$},'')
   describe.one do
     describe "The banner text should match the standard banner" do
       subject { banner_message }
