@@ -79,8 +79,8 @@ account required pam_faillock.so"
 
   describe pam('/etc/pam.d/password-auth') do
     its('lines') {
-      should match_pam_rules(required_rules).exactly.or \
-             match_pam_rules(alternate_rules).exactly
+      should match_pam_rules(required_rules).or \
+             match_pam_rules(alternate_rules)
     }
     its('lines') { should match_pam_rule('auth [default=die]|required pam_faillock.so').all_with_integer_arg('deny', '<=', unsuccessful_attempts) }
     its('lines') { should match_pam_rule('auth [default=die]|required pam_faillock.so').all_with_integer_arg('fail_interval', '<=', fail_interval) }
@@ -93,15 +93,15 @@ account required pam_faillock.so"
 
   describe pam('/etc/pam.d/system-auth') do
     its('lines') {
-      should match_pam_rules(required_rules).exactly.or \
-             match_pam_rules(alternate_rules).exactly
+      should match_pam_rules(required_rules).or \
+             match_pam_rules(alternate_rules)
     }
     its('lines') { should match_pam_rule('auth [default=die]|required pam_faillock.so').all_with_integer_arg('deny', '<=', unsuccessful_attempts) }
     its('lines') { should match_pam_rule('auth [default=die]|required pam_faillock.so').all_with_integer_arg('fail_interval', '<=', fail_interval) }
-    its('lines') {
-      should match_pam_rule('auth [default=die]|required pam_faillock.so').all_with_args('unlock_time=(0|never)').or \
-            (match_pam_rule('auth [default=die]|required pam_faillock.so').all_with_integer_arg('unlock_time', '<=', 604800).and \
-             match_pam_rule('auth [default=die]|required pam_faillock.so').all_with_integer_arg('unlock_time', '>=', lockout_time))
+    its('lines') { 
+       should match_pam_rule('auth [default=die]|required pam_faillock.so').all_with_args('unlock_time=(0|never)').or \
+             (match_pam_rule('auth [default=die]|required pam_faillock.so').all_with_integer_arg('unlock_time', '<=', 604800).and \
+              match_pam_rule('auth [default=die]|required pam_faillock.so').all_with_integer_arg('unlock_time', '>=', lockout_time))
     }
   end
 end

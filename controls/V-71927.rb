@@ -51,8 +51,8 @@ minimum password lifetime:
   end
 
   if !test_run
-    describe "This control skipped. No users found to test. All skipped based on 'known_exception_accounts' settings or UID < 1000" do
-      skip "This control skipped. No users found to test. All skipped based on 'known_exception_accounts' settings or UID < 1000"
+    describe "This control skipped. No users found to test. All skipped based on 'known_exception_accounts' settings or UID >= 1000" do
+      skip "This control skipped. No users found to test. All skipped based on 'known_exception_accounts' settings or UID >= 1000"
     end
   end
 end

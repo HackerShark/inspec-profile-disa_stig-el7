@@ -56,21 +56,33 @@ media or document the configuration to boot from removable media with the ISSO."
   blocks = roots.map { |root|
     root_file = file(root)
     root_file.symlink? ? root_file.link_path : root_file.path
-  }
+  }.uniq
 
+  test_run = false
   blocks.each { |block|
-    block_file = file(block)
-    describe block_file do
-      it { should exist }
-      its('path') { should match %r{^/dev/} }
-    end
-
-    if block_file.exist? and block_file.path.match? %r{^/dev/}
-      removable = ['/sys/block', block.sub(%r{^/dev/}, ''), 'removable'].join('/')
-      describe file(removable) do
+    if block.match(/^UUID/)
+      next
+    else
+      test_run = true
+      block_file = file(block)
+      describe block_file do
         it { should exist }
-        its('content.strip') { should eq '0' }
+        its('path') { should match %r{^/dev/} }
       end
-    end
+
+      if block_file.exist? and block_file.path.match? %r{^/dev/}
+        removable = ['/sys/block', block.sub(%r{^/dev/}, ''), 'removable'].join('/')
+        describe file(removable) do
+          it { should exist }
+          its('content.strip') { should eq '0' }
+        end
+      end
+    end  
   }
+  
+  if !test_run
+    describe "This control skipped. Drives are all mounted by UUID" do
+      skip "This control skipped. Drives are all mounted by UUID"
+    end
+  end   
 end

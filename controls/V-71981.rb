@@ -1,5 +1,12 @@
 # encoding: utf-8
 #
+
+disable_repo_gpgcheck = attribute(
+  'disable_repo_gpgcheck',
+  description: 'Allows for the skipping of the repo_gpgcheck=1 check',
+  value: false
+)
+
 control "V-71981" do
   title "The operating system must prevent the installation of software,
 patches, service packs, device drivers, or operating system components of
@@ -59,12 +66,19 @@ repo_gpgcheck=1"
       it { should exist }
     end
 
-    if yum_conf.exist?
-      context '[main]' do
-        context 'repo_gpgcheck' do
-          it { expect( ini(yum_conf.path)['main'][subject] ).to cmp 1 }
+    if !disable_repo_gpgcheck
+      if yum_conf.exist?
+        context '[main]' do
+          context 'repo_gpgcheck' do
+            it { expect( ini(yum_conf.path)['main'][subject] ).to cmp 1 }
+          end
         end
       end
+    else
+      describe "This control skipped. YUM repo_gpgcheck=1 is ignored by configuration of 'disable_repo_gpgcheck'" do
+        skip "This control skipped. YUM repo_gpgcheck=1 is ignored"
+      end
     end
+      
   end
 end

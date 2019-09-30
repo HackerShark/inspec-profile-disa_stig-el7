@@ -44,6 +44,9 @@ rpm_verify_integrity_except: [
 # V-71859 (already set to true)
 banner_message_enabled: 'true'
 
+#V-71981 -  Allow YUM to use repos that are not signed. 
+disable_repo_gpgcheck: true
+
 # V-72211 (default: false)
 log_aggregation_server: false
 
