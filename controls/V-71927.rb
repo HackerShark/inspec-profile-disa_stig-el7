@@ -1,7 +1,10 @@
 # encoding: utf-8
 #
-
-# TODO update to use the KNOWN_EXEPTION_USERS and KNOWN_SYSTEM_USERS attributes
+known_exception_accounts = attribute(
+  'known_exception_accounts',
+  description: 'Accounts that granted policy exceptions (Array)',
+  value: ['root']
+)
 
 control "V-71927" do
   title "Passwords must be restricted to a 24 hours/1 day minimum lifetime."
@@ -31,11 +34,26 @@ minimum password lifetime:
 
 # chage -m 1 [user]"
   tag "fix_id": "F-78279r1_fix"
+
+  test_run = false
   shadow.users.each do |user|
     # filtering on non-system accounts (uid >= 1000)
-    next unless user(user).uid >= 1000
-    describe shadow.users(user) do
-      its('min_days.first.to_i') { should cmp >= 1 }
+    if !user.nil? && !user(user).uid.nil?
+      next unless user(user).uid >= 1000
+      if !known_exception_accounts.nil?
+        next if known_exception_accounts.include?("#{user}")
+      end
+      test_run = true
+      describe shadow.users(user) do
+        its('min_days.first.to_i') { should cmp >= 1 }
+      end
+    end
+  end
+
+  if !test_run
+    describe "This control skipped. No users found to test. All skipped based on 'known_exception_accounts' settings or UID < 1000" do
+      skip "This control skipped. No users found to test. All skipped based on 'known_exception_accounts' settings or UID < 1000"
     end
   end
 end
+

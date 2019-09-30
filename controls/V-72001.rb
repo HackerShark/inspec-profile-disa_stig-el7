@@ -50,6 +50,12 @@ user_accounts = attribute(
   value:[]
 )
 
+known_exception_accounts = attribute(
+  'known_exception_accounts',
+  description: 'Accounts that granted policy exceptions (Array)',
+  value: []
+)
+
 control "V-72001" do
   title "The system must not have unnecessary accounts."
   desc  "Accounts providing no operational purpose provide additional
@@ -98,7 +104,7 @@ for a normal user to perform administrative-level actions.
 Document all authorized accounts on the system."
   tag "fix_id": "F-78353r1_fix"
 
-  allowed_accounts = (known_system_accounts + user_accounts).uniq
+  allowed_accounts = (known_system_accounts + user_accounts + known_exception_accounts).uniq
 
   describe "The active system users" do
     subject { passwd }
