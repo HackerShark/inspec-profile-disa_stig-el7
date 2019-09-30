@@ -199,7 +199,9 @@ The SSH service must be restarted for changes to take effect."
     #Banner property provides a path to a file and it exists.
     describe.one do
       banner = file(banner_file).content.gsub(%r{[\r\n\s]}, '')
-      banner = banner.gsub(%r{Lastlogin(.)+$},'')
+      # If you are getting Lastlogin appened check your /etc/pam.d/system-auth file 
+      # for the pam_lastlog.so setting.      
+      # banner = banner.gsub(%r{Lastlogin(.)+$},'')
       clean_banner = banner_message_text_ral.gsub(%r{[\r\n\s]}, '')
       clean_banner_limited = banner_message_text_ral_limited.gsub(%r{[\r\n\s]}, '')
 

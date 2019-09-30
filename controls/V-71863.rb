@@ -173,7 +173,9 @@ Agreement for details.\""
   end if banner_missing
 
   banner_message = banner_file.content.gsub(%r{[\r\n\s]}, '')
-  banner_message = banner_message.gsub(%r{Lastlogin(.)+$},'')
+  # If you are getting Lastlogin appened check your /etc/pam.d/system-auth file 
+  # for the pam_lastlog.so setting.
+  # banner_message = banner_message.gsub(%r{Lastlogin(.)+$},'')
   describe.one do
     describe "The banner text should match the standard banner" do
       subject { banner_message }
