@@ -9,6 +9,10 @@ disable_slow_controls: false
 # there is no monitoring of the kernel log
 monitor_kernel_log: true
 
+# V-72213 - this will allow the skipping of virus software checks, if set to true.
+# V-72215 - this will allow the skipping of virus software checks, if set to true.
+ignore_virus_software_running: true
+
 # V-71849
 # list of system files that should be allowed to change from an rpm verify point of view
 rpm_verify_perms_except: [

@@ -1,5 +1,11 @@
 # encoding: utf-8
 #
+ignore_virus_software_running = attribute(
+  'ignore_virus_software_running',
+  description: 'This can be set to false to allow virus protection running to be ignored.',
+  value: false
+)
+
 control "V-72215" do
   title "The system must update the virus scan program every seven days or more
 frequently."
@@ -68,29 +74,35 @@ this is a finding."
 
   sec_per_wk = 604800
 
-  describe.one do
-	  describe systemd_service('nails') do
-	    it { should be_running }
-	  end
-	  describe systemd_service('clamav-daemon.socket') do
-	    it { should be_running }
-	  end
-  end
-
-  if systemd_service('nails').running?
-	  virus_defs = Dir["/opt/NAI/LinuxShield/engine/dat/*.dat"]
-    virus_defs.each do |curr_def|
-	    describe file(curr_def).mtime.to_i do
-		    it { should >= Time.now.to_i - sec_per_wk }
-	    end
+  if ignore_virus_software_running
+    describe "This control has been skipped based on the 'ignore_virus_software_running' setting." do
+      skip "This control has been skipped based on the 'ignore_virus_software_running' setting."
     end
-  end
+  else
+    describe.one do
+      describe systemd_service('nails') do
+        it { should be_running }
+      end
+      describe systemd_service('clamav-daemon.socket') do
+        it { should be_running }
+      end
+    end
 
-  if systemd_service('clamav-daemon.socket').running?
-	  cvd_files = Dir["/var/lib/clamav/*.cvd"]
-    cvd_files.each do |curr_file|
-      describe file(curr_file).mtime.to_i do
-	      it { should >= Time.now.to_i - sec_per_wk }
+    if systemd_service('nails').running?
+      virus_defs = Dir["/opt/NAI/LinuxShield/engine/dat/*.dat"]
+      virus_defs.each do |curr_def|
+        describe file(curr_def).mtime.to_i do
+          it { should >= Time.now.to_i - sec_per_wk }
+        end
+      end
+    end
+
+    if systemd_service('clamav-daemon.socket').running?
+      cvd_files = Dir["/var/lib/clamav/*.cvd"]
+      cvd_files.each do |curr_file|
+        describe file(curr_file).mtime.to_i do
+          it { should >= Time.now.to_i - sec_per_wk }
+        end
       end
     end
   end

@@ -1,5 +1,11 @@
 # encoding: utf-8
 #
+ignore_virus_software_running = attribute(
+  'ignore_virus_software_running',
+  description: 'This can be set to false to allow virus protection running to be ignored.',
+  value: false
+)
+
 control "V-72213" do
   title "The system must use a virus scan program."
   desc  "
@@ -52,12 +58,18 @@ If no antivirus scan program is active on the system, this is a finding."
   tag "fix": "Install an antivirus solution on the system."
   tag "fix_id": "F-78567r2_fix"
 
-  describe.one do
-	  describe service('nails') do
-	    it { should be_running }
+  if ignore_virus_software_running
+    describe "This control has been skipped based on the 'ignore_virus_software_running' setting." do
+      skip "This control has been skipped based on the 'ignore_virus_software_running' setting."
     end
-    describe service('clamav-daemon.socket') do
-	    it { should be_running }
-	  end
+  else
+    describe.one do
+      describe service('nails') do
+        it { should be_running }
+      end
+      describe service('clamav-daemon.socket') do
+        it { should be_running }
+      end
+    end
   end
 end
