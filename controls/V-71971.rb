@@ -1,5 +1,6 @@
 # encoding: utf-8
 #
+# TODO we really do need an `semanage` resource.
 # Will need to be changed to reflect list of authorized system accounts
 admin_logins = attribute(
   'admin_logins',
@@ -7,7 +8,11 @@ admin_logins = attribute(
   description: "System accounts that support approved system activities."
 )
 
-# TODO we really do need an `semanage` resource.
+selogin_context_enforcement = attribute(
+  'selogin_context_enforcement',
+  value: 'enabled',
+  description: "Verify user accounts are mapped to an SELinux login context."
+)
 
 control "V-71971" do
   title "The operating system must prevent non-privileged users from executing
@@ -84,7 +89,27 @@ Use the following command to map a new user to the \"user_u\" role:
 
 Use the following command to map an existing user to the \"user_u\" role:
 
-# semanage login -m -s user_u <username>"
+# semanage login -m -s user_u <username>
+
+# For example, run the following command as the Linux root user to change the default mapping from unconfined_u to user_u:
+# semanage login -m -S targeted -s \"user_u\" -r s0 __default__
+#
+# unconfined_u a specific user
+# semanage login -a -s unconfined_u ec2-user
+#
+# To change back to the default behavior, run the following command as the Linux root user to map the __default__ login to the SELinux unconfined_u user:
+# semanage login -m -S targeted -s \"unconfined_u\" -r s0-s0:c0.c1023 __default__
+#
+# DEFAULT for Redhat 7.6
+# [root@somenode]# semanage login -l
+# 
+# Login Name           SELinux User         MLS/MCS Range        Service
+# 
+# __default__          unconfined_u         s0-s0:c0.c1023       *
+# root                 unconfined_u         s0-s0:c0.c1023       *
+# system_u             system_u             s0-s0:c0.c1023       *
+# "
+
   tag "fix_id": "F-78323r1_fix"
 
   describe command('selinuxenabled') do
@@ -118,6 +143,8 @@ Use the following command to map an existing user to the \"user_u\" role:
       # This is required by the STIG
       if login == '__default__'
         let(:valid_users){[ 'user_u' ]}
+      elsif login == 'system_u'
+        let(:valid_users){[ 'system_u' ]}
       elsif admin_logins.include?(login)
         let(:valid_users){[
           'sysadm_u',
@@ -130,9 +157,12 @@ Use the following command to map an existing user to the \"user_u\" role:
           'xguest_u'
         ]}
       end
-
       it { expect(seuser).to be_in(valid_users) }
-    end
+    end if selogin_context_enforcement.eql?('enabled')
+    
+    describe "The system is not eforcing Linux User <--> SELinux user mapping" do
+      skip "The system is not eforcing Linux User <--> SELinux user mapping based on the 'selogin_context_enforcement' setting"
+    end if !selogin_context_enforcement.eql?('enabled')
   end
 end
 

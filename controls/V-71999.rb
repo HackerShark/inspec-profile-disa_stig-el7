@@ -1,5 +1,10 @@
 # encoding: utf-8
 #
+yum_out_of_date_package_check = attribute(
+  'yum_out_of_date_package_check',
+  value: 'enabled', # values(enabled|disabled)
+  description: 'Should system check on scan for out of date packages'
+)
 control "V-71999" do
   title "Vendor packaged system security patches and updates must be installed
 and up to date."
@@ -59,12 +64,16 @@ available from Red Hat within 30 days or sooner as local policy dictates."
     describe 'List of out-of-date packages' do
       subject { linux_update.updates }
       it { should be_empty }
-    end
+    end if yum_out_of_date_package_check.eql?('enabled')
 
     linux_update.updates.each do |update|
       describe package(update['name']) do
         its('version') { should eq update['version'] }
       end
-    end
+    end if yum_out_of_date_package_check.eql?('enabled')
+
+    describe "The scan is not performing a YUM Update package check for out-of-date packages" do
+      skip "The scan is not performing a YUM Update package check for out-of-date packages based on the 'yum_out_of_date_package_check' setting"
+    end if !yum_out_of_date_package_check.eql?('enabled')
   end
 end

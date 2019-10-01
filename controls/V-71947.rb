@@ -1,5 +1,11 @@
 # encoding: utf-8
 #
+sudo_password_required_enforcement = attribute(
+  'sudo_password_required_enforcement',
+  value: 'enabled', # values(enabled|disabled)
+  description: 'Should system verify that user must type password when sudo is used'
+)
+
 control "V-71947" do
   title "Users must provide a password for privilege escalation."
   desc  "
@@ -44,39 +50,45 @@ Remove any occurrences of \"NOPASSWD\" tags in the file."
 
   processed = []
   to_process = ['/etc/sudoers', '/etc/sudoers.d']
+  
+  if sudo_password_required_enforcement.eql?('enabled')
+    while !to_process.empty?
+      in_process = to_process.pop
+      next if processed.include? in_process
+      processed.push in_process
 
-  while !to_process.empty?
-    in_process = to_process.pop
-    next if processed.include? in_process
-    processed.push in_process
-
-    if file(in_process).directory?
-      to_process.concat(
-        command("find #{in_process} -maxdepth 1 -mindepth 1").
-          stdout.strip.split("\n").
-          select { |f| file(f).file? }
-      )
-    elsif file(in_process).file?
-      to_process.concat(
-        command("grep -E '#include\\s+' #{in_process} | sed 's/.*#include[[:space:]]*//g'").
-          stdout.strip.split("\n").
-          map { |f| f.start_with?('/') ? f : File.join(File.dirname(in_process), f) }.
-          select { |f| file(f).exist? }
-      )
-      to_process.concat(
-        command("grep -E '#includedir\\s+' #{in_process} | sed 's/.*#includedir[[:space:]]*//g'").
-          stdout.strip.split("\n").
-          map { |f| f.start_with?('/') ? f : File.join(File.dirname(in_process), f) }.
-          select { |f| file(f).exist? }
-      )
+      if file(in_process).directory?
+        to_process.concat(
+          command("find #{in_process} -maxdepth 1 -mindepth 1").
+            stdout.strip.split("\n").
+            select { |f| file(f).file? }
+        )
+      elsif file(in_process).file?
+        to_process.concat(
+          command("grep -E '#include\\s+' #{in_process} | sed 's/.*#include[[:space:]]*//g'").
+            stdout.strip.split("\n").
+            map { |f| f.start_with?('/') ? f : File.join(File.dirname(in_process), f) }.
+            select { |f| file(f).exist? }
+        )
+        to_process.concat(
+          command("grep -E '#includedir\\s+' #{in_process} | sed 's/.*#includedir[[:space:]]*//g'").
+            stdout.strip.split("\n").
+            map { |f| f.start_with?('/') ? f : File.join(File.dirname(in_process), f) }.
+            select { |f| file(f).exist? }
+        )
+      end
     end
-  end
 
-  sudoers = processed.select { |f| file(f).file? }
+    sudoers = processed.select { |f| file(f).file? }
 
-  sudoers.each do |sudoer|
-    describe command("grep -i nopasswd #{sudoer}") do
-      its('stdout') { should_not match %r{^[^#]*NOPASSWD} }
+    sudoers.each do |sudoer|
+      describe command("grep -i nopasswd #{sudoer}") do
+        its('stdout') { should_not match %r{^[^#]*NOPASSWD} }
+      end
+    end
+  else
+    describe "Password required enforcement to SUDO has been disabled" do
+      skip "Password required enforcement to SUDO has been disabled based on the 'sudo_password_required_enforcement' setting"
     end
   end
 end

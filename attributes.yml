@@ -222,11 +222,28 @@ fail_interval: 900
 # (time in seconds)
 lockout_time: 604800
 
+# V-71947
+# If enabled - Will verify that user must type password when sudo is used. 
+# Default is enabled
+sudo_password_required_enforcement: 'disabled'
+
+
+# V-71971
+# If enabled - Verify user accounts are mapped to an SELinux login context. 
+selogin_context_enforcement: 'disabled'
+
+
 # V-71973
 # name of tool
 file_integrity_tool: 'aide'
 # (monthly, weekly, or daily)
 file_integrity_interval: 'weekly'
+
+# V-71999
+# Should system check on scan for out of date packages?
+# Default: enabled
+yum_out_of_date_package_check: disabled
+
 
 # V-72223
 # (time in seconds)
@@ -325,3 +342,5 @@ approved_tunnels: []
 # V-72039
 # Is the target expected to be a virtual machine
 virtual_machine: false
+
+

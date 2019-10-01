@@ -72,6 +72,15 @@ cron to run AIDE daily, but other file integrity tools may be used:
 
   if file_integrity_interval == 'monthly'
     describe.one do
+      # if using baseline::aide cookbook
+      if file("/etc/cron.d/#{file_integrity_tool}").exist?
+        describe file("/etc/cron.d/#{file_integrity_tool}") do
+          its('content') { should match /0 0 \* \* \* root \/usr\/sbin\/aide --check/ }
+        end
+      end   
+      describe file("/etc/cron.d/#{file_integrity_tool}") do
+        it { should exist }
+      end
       describe file("/etc/cron.daily/#{file_integrity_tool}") do
         it { should exist }
       end
@@ -102,6 +111,12 @@ cron to run AIDE daily, but other file integrity tools may be used:
     end
   elsif file_integrity_interval == 'weekly'
     describe.one do
+      # if using baseline::aide cookbook
+      if file("/etc/cron.d/#{file_integrity_tool}").exist?
+        describe file("/etc/cron.d/#{file_integrity_tool}") do
+          its('content') { should match /0 0 \* \* \* root \/usr\/sbin\/aide --check/ }
+        end
+      end      
       describe file("/etc/cron.daily/#{file_integrity_tool}") do
         it { should exist }
       end
@@ -121,6 +136,15 @@ cron to run AIDE daily, but other file integrity tools may be used:
     end
   elsif file_integrity_interval == 'daily'
     describe.one do
+      # if using baseline::aide cookbook
+      if file("/etc/cron.d/#{file_integrity_tool}").exist?
+        describe file("/etc/cron.d/#{file_integrity_tool}") do
+          its('content') { should match /0 0 \* \* \* root \/usr\/sbin\/aide --check/ }
+        end
+      end         
+      describe file("/etc/cron.d/#{file_integrity_tool}") do
+        it { should exist }
+      end
       describe file("/etc/cron.daily/#{file_integrity_tool}") do
         it { should exist }
       end
