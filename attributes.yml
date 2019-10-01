@@ -16,6 +16,9 @@ ignore_virus_software_running: true
 # V-71849
 # list of system files that should be allowed to change from an rpm verify point of view
 rpm_verify_perms_except: [
+'/var/lib/rpm/__db.001', # Expected to change as RPMs are installed on machine
+'/var/lib/rpm/__db.002', # Expected to change as RPMs are installed on machine
+'/var/lib/rpm/__db.003', # Expected to change as RPMs are installed on machine
 '/etc/pki/ca-trust/extracted/java/cacerts', 
 '/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt',
 '/etc/pki/ca-trust/extracted/pem/email-ca-bundle.pem',
@@ -233,7 +236,7 @@ system_activity_timeout: 600
 # (time in seconds)
 client_alive_interval: 600
 
-# V-71965, V-72417, V-72433
+# V-71965, V-72417, V-72433, V-72435
 # (enabled or disabled)
 smart_card_status: 'disabled'
 
@@ -258,6 +261,10 @@ grub_superusers: ['root']
 grub_user_boot_files: ['/boot/grub2/user.cfg']
 
 # V-71963
+# Ignore single user mode capabilities
+# This would be relevant for cloud based machines
+# Where one cannot boot into single user mode.
+
 # superusers for efi boot ( array )
 efi_superusers: ['root']
 

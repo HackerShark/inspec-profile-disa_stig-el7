@@ -20,6 +20,12 @@ uri: http://iase.disa.mil
 -----------------
 =end
 
+smart_card_status = attribute(
+  'smart_card_status',
+  value: 'enabled', # values(enabled|disabled)
+  description: 'Smart Card Status'
+)
+
 control "V-72435" do
   title "The operating system must implement smart card logons for multifactor
 authentication for access to privileged accounts."
@@ -88,8 +94,12 @@ Enable smart card logons with the following commands:
 
 
   describe command("authconfig --test | grep -i \"smartcard for login is\" | awk '{ print $NF }'") do
-    its('stdout.strip') { should eq 'enabled' }
+    its('stdout.strip') { should eq smart_card_status }
   end
+  
+  describe "The system is not smartcard enabled" do
+    skip "The system is not using Smartcards / PIVs to fulfil the MFA requirement, this control is Not Applicable."
+  end if !smart_card_status.eql?('enabled')
 
   describe command('authconfig --test | grep -i "smartcard removal action" | awk \'{ print $NF }\'') do
     its('stdout.strip') { should_not be nil }
