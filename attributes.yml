@@ -16,25 +16,26 @@ ignore_virus_software_running: true
 # V-71849
 # list of system files that should be allowed to change from an rpm verify point of view
 rpm_verify_perms_except: [
-'/etc/pki/ca-trust/extracted/java/cacerts',
+'/etc/pki/ca-trust/extracted/java/cacerts', 
 '/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt',
 '/etc/pki/ca-trust/extracted/pem/email-ca-bundle.pem',
 '/etc/pki/ca-trust/extracted/pem/objsign-ca-bundle.pem',
 '/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem',
-'/etc/audisp/plugins.d/syslog.conf',
-'/etc/audit/auditd.conf',
-'/etc/ntp.conf',
-'/boot/initramfs-3.10.0-862.el7.x86_64.img',
-'/root/.bash_logout',
-'/root/.bash_profile',
-'/root/.bashrc',
-'/root/.cshrc',
-'/root/.tcshrc'
+'/etc/audisp/plugins.d/syslog.conf', # Controlled by Chef
+'/etc/audit/auditd.conf', # Controlled by Chef
+'/etc/ntp.conf',        # Controlled by Chef
+'/boot/initramfs-3.10.0-862.el7.x86_64.img', # Controlled by Chef
+'/root/.bash_logout',   # Controlled by Chef
+'/root/.bash_profile',  # Controlled by Chef
+'/root/.bashrc',        # Controlled by Chef
+'/root/.cshrc',         # Controlled by Chef
+'/root/.tcshrc'         # Controlled by Chef
 ]
 
 # V-71855
 # list of system files that should be allowed to change from an rpm verify point of view
 rpm_verify_integrity_except: [
+'/etc/pam.d/sssd-shadowutils', # Controlled by Chef
 '/opt/chef/embedded/lib/ruby/gems/2.5.0/gems/chef-14.13.11/lib/chef/provider/package/yum/simplejson/__init__.pyc',
 '/opt/chef/embedded/lib/ruby/gems/2.5.0/gems/chef-14.13.11/lib/chef/provider/package/yum/simplejson/decoder.pyc',
 '/opt/chef/embedded/lib/ruby/gems/2.5.0/gems/chef-14.13.11/lib/chef/provider/package/yum/simplejson/encoder.pyc',
@@ -226,7 +227,7 @@ client_alive_interval: 600
 
 # V-71965, V-72417, V-72433
 # (enabled or disabled)
-smart_card_status: 'enabled'
+smart_card_status: 'disabled'
 
 # V-72051/V-72209
 # The path to the logging package
@@ -276,9 +277,9 @@ mfa_pkg_list: [
     'pam_krb5',
     'opensc',
     'pcsc-lite-ccid',
-    'gdm',
+   # 'gdm',
     'authconfig',
-    'authconfig-gtk',
+   # 'authconfig-gtk',
     'krb5-libs',
     'krb5-workstation',
     'krb5-pkinit',
@@ -288,7 +289,7 @@ mfa_pkg_list: [
 
 # V-77819
 # should dconf have smart card authentication
-multifactor_enabled: 'true'
+multifactor_enabled: 'false'
 
 # these shells do not allow a user to login
 non_interactive_shells: ["/sbin/nologin", "/sbin/halt", "/sbin/shutdown", "/bin/false", "/bin/sync", "/bin/true"]
