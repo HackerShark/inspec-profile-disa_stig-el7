@@ -1,5 +1,9 @@
 # encoding: utf-8
 #
+skip_deprecated_test = input(
+  'skip_deprecated_test',
+  value: true,
+  description: 'Skips test that have been deprecated and removed from the STIG.')
 
 control "V-78995" do
   title "The operating system must prevent a user from overriding the
@@ -30,7 +34,7 @@ specified period of time.
   tag "documentable": false
   tag "nist": ["AC-11 a", "Rev_4"]
   tag "subsystems": ['gnome', 'gnome3']
-  tag "check": "Verify the operating system prevents a user from overriding the
+  desc "check", "Verify the operating system prevents a user from overriding the
 screensaver lock-enabled setting for the graphical user interface.
 
 Note: If the system does not have GNOME installed, this requirement is Not
@@ -54,7 +58,7 @@ other than \"local\" is being used.
 
 If the command does not return a result, this is a finding.
 "
-  tag "fix": "Configure the operating system to prevent a user from overriding
+  desc "fix", "Configure the operating system to prevent a user from overriding
 a screensaver lock after a 15-minute period of inactivity for graphical user
 interfaces.
 
@@ -73,11 +77,17 @@ Add the setting to lock the screensaver lock-enabled setting:
 "
   tag "fix_id": "F-85745r1_fix"
 
-  describe command("gsettings writable org.gnome.desktop.screensaver lock-enabled") do
-    its('stdout.strip') { should cmp 'false' }
-  end if package('gnome-desktop3').installed?
+  if skip_deprecated_test
+    describe "This control has been deprecated out of the RHEL7 STIG. It will not be run becuase 'skip_deprecated_test' is set to True" do
+      skip "This control has been deprecated out of the RHEL7 STIG. It will not be run becuase 'skip_deprecated_test' is set to True"
+    end
+  else
+    describe command("gsettings writable org.gnome.desktop.screensaver lock-enabled") do
+      its('stdout.strip') { should cmp 'false' }
+    end if package('gnome-desktop3').installed?
 
-  describe "The GNOME desktop is not installed" do
-    skip "The GNOME desktop is not installed, this control is Not Applicable."
-  end if !package('gnome-desktop3').installed?
+    describe "The GNOME desktop is not installed" do
+      skip "The GNOME desktop is not installed, this control is Not Applicable."
+    end if !package('gnome-desktop3').installed?
+  end  
 end

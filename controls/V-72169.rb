@@ -1,5 +1,10 @@
 # encoding: utf-8
 #
+skip_deprecated_test = input(
+  'skip_deprecated_test',
+  value: true,
+  description: 'Skips test that have been deprecated and removed from the STIG.')
+
 control "V-72169" do
   title "All uses of the sudoedit command must be audited."
   desc  "
@@ -22,7 +27,7 @@ compromise.
   tag "documentable": false
   tag "nist": ["AU-3", "AU-3 (1)", "AU-12 c", "MA-4 (1) (a)", "Rev_4"]
   tag "subsystems": ['audit', 'auditd', 'audit_rule']
-  tag "check": "Verify the operating system generates audit records when
+  desc "check", "Verify the operating system generates audit records when
 successful/unsuccessful attempts to use the \"sudoedit\" command occur.
 
 Check for the following system calls being audited by performing the following
@@ -33,7 +38,7 @@ command to check the file system rules in \"/etc/audit/audit.rules\":
 -a always,exit -F path=/bin/sudoedit -F perm=x -F auid>=1000 -F auid!=4294967295 -k privileged-priv_change
 
 If the command does not return any output, this is a finding."
-  tag "fix": "Configure the operating system to generate audit records when
+  desc "fix", "Configure the operating system to generate audit records when
 successful/unsuccessful attempts to use the \"sudoedit\" command occur.
 
 Add or update the following rule in \"/etc/audit/rules.d/audit.rules\":
@@ -51,21 +56,27 @@ The audit daemon must be restarted for the changes to take effect."
     impact 0.0
   end
 
-  describe auditd.file(audit_file) do
-    its('permissions') { should_not cmp [] }
-    its('action') { should_not include 'never' }
-  end if file(audit_file).exist?
-
-  # Resource creates data structure including all usages of file
-  perms = auditd.file(audit_file).permissions
-
-  perms.each do |perm|
-    describe perm do
-      it { should include 'x' }
+  if skip_deprecated_test
+    describe "This control has been deprecated out of the RHEL7 STIG. It will not be run becuase 'skip_deprecated_test' is set to True" do
+      skip "This control has been deprecated out of the RHEL7 STIG. It will not be run becuase 'skip_deprecated_test' is set to True"
     end
-  end if file(audit_file).exist?
+  else
+    describe auditd.file(audit_file) do
+      its('permissions') { should_not cmp [] }
+      its('action') { should_not include 'never' }
+    end if file(audit_file).exist?
 
-  describe "The #{audit_file} file does not exist" do
-    skip "The #{audit_file} file does not exist, this requirement is Not Applicable."
-  end if !file(audit_file).exist?
+    # Resource creates data structure including all usages of file
+    perms = auditd.file(audit_file).permissions
+
+    perms.each do |perm|
+      describe perm do
+        it { should include 'x' }
+      end
+    end if file(audit_file).exist?
+
+    describe "The #{audit_file} file does not exist" do
+      skip "The #{audit_file} file does not exist, this requirement is Not Applicable."
+    end if !file(audit_file).exist?
+  end  
 end

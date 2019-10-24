@@ -1,6 +1,6 @@
 # encoding: utf-8
 #
-banner_message_text_gui = attribute('banner_message_text_gui',
+banner_message_text_gui = input('banner_message_text_gui',
 value:
 "You are accessing a U.S. Government (USG) Information System (IS) that is \
 provided for USG-authorized use only. By using this IS (which includes any \
@@ -22,7 +22,7 @@ communications and work product are private and confidential. See User \
 Agreement for details.",
 description: 'The banner message must display the designated banner before granting access.')
 
-banner_message_text_gui_limited = attribute('banner_message_text_gui_limited',
+banner_message_text_gui_limited = input('banner_message_text_gui_limited',
 value: "I've read & consent to terms in IS user agreem't.",
 description: 'The banner message must display the designated banner before granting access.')
 
@@ -89,7 +89,7 @@ the number of characters that can be displayed in the banner:
   tag "documentable": false
   tag "nist": ["AC-8 a", "Rev_4"]
   tag "subsystems": [ "gdm" ]
-  tag "check": "Verify the operating system displays the approved Standard
+  desc "check", "Verify the operating system displays the approved Standard
 Mandatory DoD Notice and Consent Banner before granting access to the operating
 system via a graphical user logon.
 
@@ -127,7 +127,7 @@ on the GUI.
 
 If the banner does not match the approved Standard Mandatory DoD Notice and
 Consent Banner, this is a finding."
-  tag "fix": "Configure the operating system to display the approved Standard
+  desc "fix", "Configure the operating system to display the approved Standard
 Mandatory DoD Notice and Consent Banner before granting access to the system.
 
 Note: If the system does not have GNOME installed, this requirement is Not

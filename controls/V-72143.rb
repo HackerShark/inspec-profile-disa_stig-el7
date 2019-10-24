@@ -1,5 +1,10 @@
 # encoding: utf-8
 #
+skip_deprecated_test = input(
+  'skip_deprecated_test',
+  value: true,
+  description: 'Skips test that have been deprecated and removed from the STIG.')
+
 control "V-72143" do
   title "The operating system must generate audit records for all
 successful/unsuccessful account access count events."
@@ -22,7 +27,7 @@ information system (e.g., module or policy filter).
   tag "documentable": false
   tag "nist": ["AU-2 d", "AU-12 c", "MA-4 (1) (a)", "Rev_4"]
   tag "subsystems": ['audit', 'auditd', 'audit_rule']
-  tag "check": "Verify the operating system generates audit records when
+  desc "check", "Verify the operating system generates audit records when
 successful/unsuccessful account access count events occur.
 
 Check the file system rule in \"/etc/audit/audit.rules\" with the following
@@ -33,7 +38,7 @@ commands:
 -w /var/log/tallylog -p wa -k logins
 
 If the command does not return any output, this is a finding."
-  tag "fix": "Configure the operating system to generate audit records when
+  desc "fix", "Configure the operating system to generate audit records when
 successful/unsuccessful account access count events occur.
 
 Add or update the following rule in \"/etc/audit/rules.d/audit.rules\":
@@ -51,22 +56,28 @@ The audit daemon must be restarted for the changes to take effect."
     impact 0.0
   end
 
-  describe auditd.file(audit_file) do
-    its('permissions') { should_not cmp [] }
-    its('action') { should_not include 'never' }
-  end if file(audit_file).exist?
-
-  # Resource creates data structure including all usages of file
-  perms = auditd.file(audit_file).permissions
-
-  perms.each do |perm|
-    describe perm do
-      it { should include 'w' }
-      it { should include 'a' }
+  if skip_deprecated_test
+    describe "This control has been deprecated out of the RHEL7 STIG. It will not be run becuase 'skip_deprecated_test' is set to True" do
+      skip "This control has been deprecated out of the RHEL7 STIG. It will not be run becuase 'skip_deprecated_test' is set to True"
     end
-  end if file(audit_file).exist?
+  else
+    describe auditd.file(audit_file) do
+      its('permissions') { should_not cmp [] }
+      its('action') { should_not include 'never' }
+    end if file(audit_file).exist?
 
-  describe "The #{audit_file} file does not exist" do
-    skip "The #{audit_file} file does not exist, this requirement is Not Applicable."
-  end if !file(audit_file).exist?
+    # Resource creates data structure including all usages of file
+    perms = auditd.file(audit_file).permissions
+
+    perms.each do |perm|
+      describe perm do
+        it { should include 'w' }
+        it { should include 'a' }
+      end
+    end if file(audit_file).exist?
+
+    describe "The #{audit_file} file does not exist" do
+      skip "The #{audit_file} file does not exist, this requirement is Not Applicable."
+    end if !file(audit_file).exist?
+  end  
 end

@@ -1,11 +1,15 @@
 # encoding: utf-8
 #
-
 disable_repo_gpgcheck = attribute(
   'disable_repo_gpgcheck',
   description: 'Allows for the skipping of the repo_gpgcheck=1 check',
   value: false
 )
+
+skip_deprecated_test = input(
+  'skip_deprecated_test',
+  value: true,
+  description: 'Skips test that have been deprecated and removed from the STIG.')
 
 control "V-71981" do
   title "The operating system must prevent the installation of software,
@@ -37,7 +41,7 @@ used to verify the software must be from an approved Certificate Authority.
   tag "documentable": false
   tag "nist": ["CM-5 (3)", "Rev_4"]
   tag "subsystems": ['yum']
-  tag "check": "Verify the operating system prevents the installation of
+  desc "check", "Verify the operating system prevents the installation of
 patches, service packs, device drivers, or operating system components of local
 packages without verification of the repository metadata.
 
@@ -53,19 +57,24 @@ and other operating system components are verified.
 
 If there is no process to validate the metadata of packages that is approved by
 the organization, this is a finding."
-  tag "fix": "Configure the operating system to verify the repository metadata
+  desc "fix", "Configure the operating system to verify the repository metadata
 by setting the following options in the \"/etc/yum.conf\" file:
 
 repo_gpgcheck=1"
   tag "fix_id": "F-78333r1_fix"
 
-  yum_conf = file('/etc/yum.conf')
-
-  describe yum_conf.path do
-    context yum_conf do
-      it { should exist }
+  if skip_deprecated_test
+    describe "This control has been deprecated out of the RHEL7 STIG. It will not be run becuase 'skip_deprecated_test' is set to True" do
+      skip "This control has been deprecated out of the RHEL7 STIG. It will not be run becuase 'skip_deprecated_test' is set to True"
     end
+  else
+    yum_conf = file('/etc/yum.conf')
 
+    describe yum_conf.path do
+      context yum_conf do
+        it { should exist }
+      end
+    end  
     if !disable_repo_gpgcheck
       if yum_conf.exist?
         context '[main]' do
@@ -79,6 +88,5 @@ repo_gpgcheck=1"
         skip "This control skipped. YUM repo_gpgcheck=1 is ignored"
       end
     end
-      
-  end
+  end  
 end

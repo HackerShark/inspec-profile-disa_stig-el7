@@ -1,7 +1,7 @@
 # encoding: utf-8
 #
 
-known_system_accounts = attribute(
+known_system_accounts = input(
   'known_system_accounts',
   value: [
         'root',
@@ -34,7 +34,7 @@ known_system_accounts = attribute(
   description: 'System accounts that support approved system activities. (Array)'
 )
 
-disallowed_accounts = attribute(
+disallowed_accounts = input(
   'disallowed_accounts',
   description: 'Accounts that are not allowed on the system (Array)',
   value: [
@@ -44,7 +44,7 @@ disallowed_accounts = attribute(
   ]
 )
 
-user_accounts = attribute(
+user_accounts = input(
   'user_accounts',
   description: 'accounts of known managed users (Array)',
   value:[]
@@ -71,7 +71,7 @@ applications not installed on the system."
   tag "documentable": false
   tag "nist": ["CM-6 b", "Rev_4"]
   tag "subsystems": ['accounts']
-  tag "check": "Verify all accounts on the system are assigned to an active
+  desc "check", "Verify all accounts on the system are assigned to an active
 system, application, or user account.
 
 Obtain the list of authorized system accounts from the Information System
@@ -95,7 +95,7 @@ do not support authorized system functions.
 If the accounts on the system do not match the provided documentation, or
 accounts that do not support an authorized system function are present, this is
 a finding."
-  tag "fix": "Configure the system so all accounts on the system are assigned
+  desc "fix", "Configure the system so all accounts on the system are assigned
 to an active system, application, or user account.
 
 Remove accounts that do not support approved system activities or that allow

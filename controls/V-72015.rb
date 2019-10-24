@@ -3,13 +3,13 @@
 
 # TODO ENHANCE: 1. this needs to be enhanced, i.e. to check the right thing. like V-72017
 
-exempt_home_users = attribute(
+exempt_home_users = input(
   'exempt_home_users',
   description: 'These are `home dir` exempt interactive accounts',
   value: []
 )
 
-non_interactive_shells = attribute(
+non_interactive_shells = input(
   'non_interactive_shells',
   description: 'These shells do not allow a user to login',
   value: ["/sbin/nologin","/sbin/halt","/sbin/shutdown","/bin/false","/bin/sync", "/bin/true"]
@@ -32,7 +32,7 @@ them visibility to system files they normally would not be able to access."
   tag "documentable": false
   tag "nist": ["CM-6 b", "Rev_4"]
   tag "subsystems": ['accounts']
-  tag "check": "Verify the assigned home directory of all local interactive
+  desc "check", "Verify the assigned home directory of all local interactive
 users on the system exists.
 
 Check the home directory assignment for all local interactive non-privileged
@@ -52,7 +52,7 @@ user 'smithj': directory '/home/smithj' does not exist
 
 If any home directories referenced in \"/etc/passwd\" are returned as not
 defined, this is a finding."
-  tag "fix": "Create home directories to all local interactive users that
+  desc "fix", "Create home directories to all local interactive users that
 currently do not have a home directory assigned. Use the following commands to
 create the user home directory assigned in \"/etc/ passwd\":
 

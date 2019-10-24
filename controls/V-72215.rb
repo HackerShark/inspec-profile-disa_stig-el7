@@ -1,10 +1,16 @@
 # encoding: utf-8
 #
+
 ignore_virus_software_running = attribute(
   'ignore_virus_software_running',
   description: 'This can be set to false to allow virus protection running to be ignored.',
   value: false
 )
+
+skip_deprecated_test = input(
+  'skip_deprecated_test',
+  value: true,
+  description: 'Skips test that have been deprecated and removed from the STIG.')
 
 control "V-72215" do
   title "The system must update the virus scan program every seven days or more
@@ -27,7 +33,7 @@ must be documented with the Information System Security Officer (ISSO).
   tag "documentable": false
   tag "nist": ["SI-3 a", "Rev_4"]
   tag "subsystems": ['clamav', 'nails', 'virus_scan']
-  tag "check": "Verify the system is using a virus scan program and the virus
+  desc "check", "Verify the system is using a virus scan program and the virus
 definition file is less than seven days old.
 
 Check for the presence of \"McAfee VirusScan Enterprise for Linux\" with the
@@ -69,41 +75,41 @@ DatabaseDirectory /var/lib/clamav
 
 If the database file has a date older than seven days from the current date,
 this is a finding."
-  tag "fix": "Update the virus scan software and virus definition files."
+  desc "fix", "Update the virus scan software and virus definition files."
   tag "fix_id": "F-78569r2_fix"
 
-  sec_per_wk = 604800
-
-  if ignore_virus_software_running
-    describe "This control has been skipped based on the 'ignore_virus_software_running' setting." do
-      skip "This control has been skipped based on the 'ignore_virus_software_running' setting."
+  if skip_deprecated_test
+    describe "This control has been deprecated out of the RHEL7 STIG. It will not be run becuase 'skip_deprecated_test' is set to True" do
+      skip "This control has been deprecated out of the RHEL7 STIG. It will not be run becuase 'skip_deprecated_test' is set to True"
     end
   else
+    sec_per_wk = 604800
+
     describe.one do
-      describe systemd_service('nails') do
-        it { should be_running }
-      end
-      describe systemd_service('clamav-daemon.socket') do
-        it { should be_running }
-      end
+  	  describe systemd_service('nails') do
+  	    it { should be_running }
+  	  end
+  	  describe systemd_service('clamav-daemon.socket') do
+  	    it { should be_running }
+  	  end
     end
 
     if systemd_service('nails').running?
-      virus_defs = Dir["/opt/NAI/LinuxShield/engine/dat/*.dat"]
+  	  virus_defs = Dir["/opt/NAI/LinuxShield/engine/dat/*.dat"]
       virus_defs.each do |curr_def|
-        describe file(curr_def).mtime.to_i do
-          it { should >= Time.now.to_i - sec_per_wk }
-        end
+  	    describe file(curr_def).mtime.to_i do
+  		    it { should >= Time.now.to_i - sec_per_wk }
+  	    end
       end
     end
 
     if systemd_service('clamav-daemon.socket').running?
-      cvd_files = Dir["/var/lib/clamav/*.cvd"]
+  	  cvd_files = Dir["/var/lib/clamav/*.cvd"]
       cvd_files.each do |curr_file|
         describe file(curr_file).mtime.to_i do
-          it { should >= Time.now.to_i - sec_per_wk }
+  	      it { should >= Time.now.to_i - sec_per_wk }
         end
       end
     end
-  end
+  end  
 end

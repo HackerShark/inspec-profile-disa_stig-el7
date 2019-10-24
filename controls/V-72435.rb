@@ -1,26 +1,11 @@
 # encoding: utf-8
 #
-=begin
------------------
-Benchmark: Red Hat Enterprise Linux 7 Security Technical Implementation Guide
-Status: Accepted
+skip_deprecated_test = input(
+  'skip_deprecated_test',
+  value: true,
+  description: 'Skips test that have been deprecated and removed from the STIG.')
 
-This Security Technical Implementation Guide is published as a tool to improve
-the security of Department of Defense (DoD) information systems. The
-requirements are derived from the National Institute of Standards and
-Technology (NIST) 800-53 and related documents. Comments or proposed revisions
-to this document should be sent via email to the following address:
-disa.stig_spt@mail.mil.
-
-Release Date: 2017-03-08
-Version: 1
-Publisher: DISA
-Source: STIG.DOD.MIL
-uri: http://iase.disa.mil
------------------
-=end
-
-smart_card_status = attribute(
+smart_card_status = input(
   'smart_card_status',
   value: 'enabled', # values(enabled|disabled)
   description: 'Smart Card Status'
@@ -70,7 +55,7 @@ SRG-OS-000375-GPOS-0016.
   tag "cci": "CCI-001954"
   tag "nist": ["IA-2 (12)", "Rev_4"]
   tag "subsystems": ['smartcard', 'MFA']
-  tag "check": "Verify the operating system requires smart card logons for
+  desc "check", "Verify the operating system requires smart card logons for
 multifactor authentication to uniquely identify privileged users.
 
 Check to see if smartcard authentication is enforced on the system with the
@@ -84,7 +69,7 @@ and smartcard removal actions must not be blank.
 If smartcard authentication is disabled or the smartcard and smartcard removal
 actions are blank, this is a finding."
 
-  tag "fix": "Configure the operating system to implement smart card logon for
+  desc "fix", "Configure the operating system to implement smart card logon for
 multifactor authentication to uniquely identify privileged users.
 
 Enable smart card logons with the following commands:
@@ -92,17 +77,17 @@ Enable smart card logons with the following commands:
 # authconfig --enablesmartcard --smartcardaction=1 --update
 # authconfig --enablerequiresmartcard --update"
 
+  if skip_deprecated_test
+    describe "This control has been deprecated out of the RHEL7 STIG. It will not be run becuase 'skip_deprecated_test' is set to True" do
+      skip "This control has been deprecated out of the RHEL7 STIG. It will not be run becuase 'skip_deprecated_test' is set to True"
+    end
+  else
+    describe command("authconfig --test | grep -i \"smartcard for login is\" | awk '{ print $NF }'") do
+      its('stdout.strip') { should eq 'enabled' }
+    end
 
-  describe command("authconfig --test | grep -i \"smartcard for login is\" | awk '{ print $NF }'") do
-    its('stdout.strip') { should eq smart_card_status }
+    describe command('authconfig --test | grep -i "smartcard removal action" | awk \'{ print $NF }\'') do
+      its('stdout.strip') { should_not be nil }
+    end
   end
-  
-  describe "The system is not smartcard enabled" do
-    skip "The system is not using Smartcards / PIVs to fulfil the MFA requirement, this control is Not Applicable."
-  end if !smart_card_status.eql?('enabled')
-
-  describe command('authconfig --test | grep -i "smartcard removal action" | awk \'{ print $NF }\'') do
-    its('stdout.strip') { should_not be nil }
-  end
-
 end

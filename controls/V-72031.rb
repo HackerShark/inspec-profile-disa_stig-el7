@@ -1,13 +1,13 @@
 # encoding: utf-8
 #
 
-exempt_home_users = attribute(
+exempt_home_users = input(
   'exempt_home_users',
   description: 'These are `home dir` exempt interactive accounts',
   value: []
 )
 
-non_interactive_shells = attribute(
+non_interactive_shells = input(
   'non_interactive_shells',
   description: 'These shells do not allow a user to login',
   value: ["/sbin/nologin","/sbin/halt","/sbin/shutdown","/bin/false","/bin/sync", "/bin/true"]
@@ -28,7 +28,7 @@ could compromise accounts upon logon."
   tag "documentable": false
   tag "nist": ["CM-6 b", "Rev_4"]
   tag "subsystems": ['init_files']
-  tag "check": "Verify the local initialization files of all local interactive
+  desc "check", "Verify the local initialization files of all local interactive
 users are group-owned by that user’s primary Group Identifier (GID).
 
 Check the home directory assignment for all non-privileged users on the system
@@ -57,7 +57,7 @@ the following command:
 
 If all local interactive users’ initialization files are not group-owned by
 that user’s primary GID, this is a finding."
-  tag "fix": "Change the group owner of a local interactive user’s files to the
+  desc "fix", "Change the group owner of a local interactive user’s files to the
 group found in \"/etc/passwd\" for the user. To change the group owner of a
 local interactive user home directory, use the following command:
 

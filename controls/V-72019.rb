@@ -1,13 +1,13 @@
 # encoding: utf-8
 #
 
-exempt_home_users = attribute(
+exempt_home_users = input(
   'exempt_home_users',
   description: 'These are `home dir` exempt interactive accounts',
   value: []
 )
 
-non_interactive_shells = attribute(
+non_interactive_shells = input(
   'non_interactive_shells',
   description: 'These shells do not allow a user to login',
   value: ["/sbin/nologin","/sbin/halt","/sbin/shutdown","/bin/false","/bin/sync", "/bin/true"]
@@ -28,7 +28,7 @@ not be able to access their own files."
   tag "documentable": false
   tag "nist": ["CM-6 b", "Rev_4"]
   tag "subsystems": ['home_dirs']
-  tag "check": "Verify the assigned home directory of all local interactive
+  desc "check", "Verify the assigned home directory of all local interactive
 users on the system exists.
 
 Check the home directory assignment for all local interactive users on the
@@ -40,7 +40,7 @@ system with the following command:
 
 If any home directories referenced in \"/etc/passwd\" are not owned by the
 interactive user, this is a finding."
-  tag "fix": "Change the owner of a local interactive user’s home directories
+  desc "fix", "Change the owner of a local interactive user’s home directories
 to that owner. To change the owner of a local interactive user’s home
 directory, use the following command:
 

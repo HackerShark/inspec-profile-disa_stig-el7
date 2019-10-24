@@ -1,17 +1,17 @@
 # encoding: utf-8
 #
 
-efi_superusers = attribute(
+efi_superusers = input(
   'efi_superusers',
   description: 'superusers for efi boot ( array )',
   value: ['root']
 )
-efi_user_boot_files = attribute(
+efi_user_boot_files = input(
  'efi_user_boot_files',
  description: 'efi boot config files',
  value: ['/boot/efi/EFI/redhat/user.cfg']
 )
-efi_main_cfg = attribute(
+efi_main_cfg = input(
  'efi_main_cfg',
  description: 'main efi boot config file',
  value: '/boot/efi/EFI/redhat/grub.cfg'
@@ -34,7 +34,7 @@ to boot into single-user mode or make modifications to the boot menu."
   tag "documentable": false
   tag "nist": ["AC-3", "Rev_4"]
   tag "subsystems": ['grub']
-  tag "check": "For systems that use BIOS, this is Not Applicable.
+  desc "check", "For systems that use BIOS, this is Not Applicable.
 
 Check to see if an encrypted root password is set. On systems that use UEFI,
 use the following command:
@@ -47,7 +47,7 @@ If the root password entry does not begin with \"password_pbkdf2\", this is a
 finding.
 
 If the \"superusers-account\" is not set to \"root\", this is a finding."
-  tag "fix": "Configure the system to encrypt the boot password for root.
+  desc "fix", "Configure the system to encrypt the boot password for root.
 
 Generate an encrypted grub2 password for root with the following command:
 

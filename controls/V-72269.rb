@@ -1,5 +1,10 @@
 # encoding: utf-8
 #
+ntp_service_selected = attribute(
+  'ntp_service_selected',
+  value: 'ntpd', # values(ntpd|chronyd)
+  description: 'Timing Service Configured to get NTP time from'
+)
 control "V-72269" do
   title "The operating system must, for networked systems, synchronize clocks
 with a server that is synchronized to one of the redundant United States Naval
@@ -21,6 +26,7 @@ the authoritative time server (e.g., mobile, teleworking, and tactical
 endpoints).
   "
   impact 0.5
+  
   tag "gtitle": "SRG-OS-000355-GPOS-00143"
   tag "satisfies": ["SRG-OS-000355-GPOS-00143", "SRG-OS-000356-GPOS-00144"]
   tag "gid": "V-72269"
@@ -28,59 +34,78 @@ endpoints).
   tag "stig_id": "RHEL-07-040500"
   tag "cci": ["CCI-001891", "CCI-002046"]
   tag "documentable": false
+  tag "subsystems": ['ntp']  
   tag "nist": ["AU-8 (1) (a)", "AU-8 (1) (b)", "Rev_4"]
-  tag "check": "Check to see if NTP is running in continuous mode.
-
-# ps -ef | grep ntp
-
-If NTP is not running, this is a finding.
-
-If the process is found, then check the \"ntp.conf\" file for the \"maxpoll\"
-option setting:
-
-# grep maxpoll /etc/ntp.conf
-
-maxpoll 17
-
-If the option is set to \"17\" or is not set, this is a finding.
-
-If the file does not exist, check the \"/etc/cron.daily\" subdirectory for a
-crontab file controlling the execution of the \"ntpdate\" command.
-
-# grep –l ntpdate /etc/cron.daily
-
-# ls -al /etc/cron.* | grep ntp
-ntp
-
-If a crontab file does not exist in the \"/etc/cron.daily\" that executes the
-\"ntpdate\" file, this is a finding."
-  tag "fix": "Edit the \"/etc/ntp.conf\" file and add or update an entry to
-define \"maxpoll\" to \"10\" as follows:
-
-maxpoll 10
-
-If NTP was running and \"maxpoll\" was updated, the NTP service must be
-restarted:
-
-# systemctl restart ntpd
-
-If NTP was not running, it must be started:
-
-# systemctl start ntpd"
   tag "fix_id": "F-78623r3_fix"
 
-  describe service('ntpd') do
-    it { should be_running }
-  end
+  desc "check", "Check to see if NTP is running in continuous mode.
 
+  # ps -ef | grep ntp
+
+  If NTP is not running, this is a finding.
+
+  If the process is found, then check the \"ntp.conf\" file for the \"maxpoll\"
+  option setting:
+
+  # grep maxpoll /etc/ntp.conf
+
+  maxpoll 17
+
+  If the option is set to \"17\" or is not set, this is a finding.
+
+  If the file does not exist, check the \"/etc/cron.daily\" subdirectory for a
+  crontab file controlling the execution of the \"ntpdate\" command.
+
+  # grep –l ntpdate /etc/cron.daily
+
+  # ls -al /etc/cron.* | grep ntp
+  ntp
+
+  If a crontab file does not exist in the \"/etc/cron.daily\" that executes the
+  \"ntpdate\" file, this is a finding."
+  
+  desc "fix", "Edit the \"/etc/ntp.conf\" file and add or update an entry to
+  define \"maxpoll\" to \"10\" as follows:
+
+  maxpoll 10
+
+  If NTP was running and \"maxpoll\" was updated, the NTP service must be
+  restarted:
+
+  # systemctl restart ntpd
+
+  If NTP was not running, it must be started:
+
+  # systemctl start ntpd"
+
+
+  if ntp_service_selected.eql?('ntpd') then
+    describe service('ntpd') do
+      it { should be_running }
+    end
+  end
+  
+  if ntp_service_selected.eql?('chronyd') then
+    describe service('chronyd') do
+      it { should be_running }
+    end
+  end
+    
   describe.one do
-    describe command('ntpd --saveconfigquit=/dev/stdout | grep -E "^server\s"') do
-      its('stdout.strip') { should_not be_empty }
-      its('stdout.strip.lines') { should all(match %r{\smaxpoll\s+([1-9]|1[0-6])\b}) }
-    end
-    # Case where maxpoll empty
-    describe file('/etc/cron.daily/ntpdate') do
-      it { should exist }
-    end
+    if ntp_service_selected.eql?('ntpd') then
+      describe command('ntpd --saveconfigquit=/dev/stdout | grep -E "^server\s"') do
+        its('stdout.strip') { should_not be_empty }
+        its('stdout.strip.lines') { should all(match %r{\smaxpoll\s+([1-9]|1[0-6])\b}) }
+      end
+      # Case where maxpoll empty
+      describe file('/etc/cron.daily/ntpdate') do
+        it { should exist }
+      end
+    end  
+    if ntp_service_selected.eql?('chronyd') then
+      describe command('grep -E "^(\s+)*server\s" /etc/chrony.conf') do
+        its('stdout.strip.lines') { should all(match %r{\smaxpoll\s+([1-9]|1[0-6])\b}) }
+      end
+    end  
   end
 end

@@ -1,7 +1,7 @@
 # encoding: utf-8
 #
 
-mfa_pkg_list = attribute(
+mfa_pkg_list = input(
     'mfa_pkg_list',
     description: 'The list of packages needed for MFA on RHEL',
     value: [
@@ -10,7 +10,7 @@ mfa_pkg_list = attribute(
       'authconfig-gtk',
     ])
 
-smart_card_status = attribute(
+smart_card_status = input(
   'smart_card_status',
   value: 'enabled', # values(enabled|disabled)
   description: 'Smart Card Status'
@@ -62,7 +62,7 @@ configuring the device itself (management).
   tag "nist": ["IA-2 (11)", "IA-2 (12)", "IA-2 (12)", "Rev_4"]
   tag "subsystems": ['pki', 'pam', 'MFA', 'pkcs11', 'smartcard']
   tag "pki","MFA","pam","pkcs11","networking"
-  tag "check": "Verify the operating system has the packages required for
+  desc "check", "Verify the operating system has the packages required for
 multifactor authentication installed.
 
 Check for the presence of the packages required to support multifactor
@@ -79,7 +79,7 @@ authconfig-gtk-6.1.12-19.el7.noarch.rpm
 
 If the \"esc\", \"pam_pkcs11\", and \"authconfig-gtk\" packages are not
 installed, this is a finding."
-  tag "fix": "Configure the operating system to implement multifactor
+  desc "fix", "Configure the operating system to implement multifactor
 authentication by installing the required packages.
 
 Install the \"esc\", \"pam_pkcs11\", \"authconfig\", and \"authconfig-gtk\"
