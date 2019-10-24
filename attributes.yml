@@ -28,6 +28,7 @@ rpm_verify_perms_except: [
 '/etc/audit/auditd.conf', # Controlled by Chef
 '/etc/ntp.conf',        # Controlled by Chef
 '/boot/initramfs-3.10.0-862.el7.x86_64.img', # Controlled by Chef
+''/etc/grub.d/40_custom', # Controlled by Chef
 '/root/.bash_logout',   # Controlled by Chef
 '/root/.bash_profile',  # Controlled by Chef
 '/root/.bashrc',        # Controlled by Chef
