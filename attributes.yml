@@ -45,7 +45,8 @@ rpm_verify_perms_except: [
 '/etc/audisp/plugins.d/syslog.conf', # Controlled by Chef
 '/etc/audit/auditd.conf', # Controlled by Chef
 '/etc/ntp.conf',        # Controlled by Chef
-'/boot/initramfs-3.10.0-862.el7.x86_64.img', # Controlled by Chef
+'/boot/initramfs-3.10.0-862.el7.x86_64.img', # Controlled by Chef - Gets rebuilt by baseline::grub
+'/boot/initramfs-3.10.0-957.21.3.el7.x86_64.img',     # Controlled by Chef - Gets rebuilt by baseline::grub
 '/etc/grub.d/40_custom', # Controlled by Chef
 '/root/.bash_logout',   # Controlled by Chef
 '/root/.bash_profile',  # Controlled by Chef
@@ -59,7 +60,10 @@ rpm_verify_perms_except: [
 '/etc/cron.weekly',     # Controlled by Chef
 '/etc/crontab',         # Controlled by Chef
 '/etc/chrony.conf',     # Controlled by Chef - baseline:ntpd
-'/boot/initramfs-3.10.0-957.21.3.el7.x86_64.img',     # Controlled by Chef - Gets rebuilt by baseline::grub
+'/etc/lvm/cache/.cache',
+'/var/spool/anacron/cron.weekly',
+'/var/spool/anacron/cron.monthly',
+'/var/spool/anacron/cron.daily',
 ] 
 
 # V-71855
