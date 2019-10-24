@@ -38,6 +38,10 @@ rpm_verify_perms_except: [
 '/etc/pki/ca-trust/extracted/pem/email-ca-bundle.pem',
 '/etc/pki/ca-trust/extracted/pem/objsign-ca-bundle.pem',
 '/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem',
+'/opt/chef/embedded/lib/ruby/gems/2.5.0/gems/chef-14.13.11/lib/chef/provider/package/yum/simplejson/__init__.pyc',
+'/opt/chef/embedded/lib/ruby/gems/2.5.0/gems/chef-14.13.11/lib/chef/provider/package/yum/simplejson/decoder.pyc',
+'/opt/chef/embedded/lib/ruby/gems/2.5.0/gems/chef-14.13.11/lib/chef/provider/package/yum/simplejson/encoder.pyc',
+'/opt/chef/embedded/lib/ruby/gems/2.5.0/gems/chef-14.13.11/lib/chef/provider/package/yum/simplejson/scanner.pyc',
 '/etc/audisp/plugins.d/syslog.conf', # Controlled by Chef
 '/etc/audit/auditd.conf', # Controlled by Chef
 '/etc/ntp.conf',        # Controlled by Chef
@@ -54,7 +58,10 @@ rpm_verify_perms_except: [
 '/etc/cron.monthly',    # Controlled by Chef
 '/etc/cron.weekly',     # Controlled by Chef
 '/etc/crontab',         # Controlled by Chef
-]
+'/etc/chrony.conf',     # Controlled by Chef - baseline:ntpd
+'/boot/initramfs-3.10.0-957.21.3.el7.x86_64.img',     # Controlled by Chef - Gets rebuilt by baseline::grub
+] 
+
 # V-71855
 # list of system files that should be allowed to change from an rpm verify point of view
 rpm_verify_integrity_except: [
@@ -62,7 +69,10 @@ rpm_verify_integrity_except: [
 '/opt/chef/embedded/lib/ruby/gems/2.5.0/gems/chef-14.13.11/lib/chef/provider/package/yum/simplejson/__init__.pyc',
 '/opt/chef/embedded/lib/ruby/gems/2.5.0/gems/chef-14.13.11/lib/chef/provider/package/yum/simplejson/decoder.pyc',
 '/opt/chef/embedded/lib/ruby/gems/2.5.0/gems/chef-14.13.11/lib/chef/provider/package/yum/simplejson/encoder.pyc',
-'/opt/chef/embedded/lib/ruby/gems/2.5.0/gems/chef-14.13.11/lib/chef/provider/package/yum/simplejson/scanner.pyc'
+'/opt/chef/embedded/lib/ruby/gems/2.5.0/gems/chef-14.13.11/lib/chef/provider/package/yum/simplejson/scanner.pyc',
+'/etc/chrony.conf',     # Controlled by Chef - baseline:ntpd
+'/boot/initramfs-3.10.0-957.21.3.el7.x86_64.img',     # Controlled by Chef - Gets rebuilt by baseline::grub
+
 ]
 
 # V-71859 (already set to true)
