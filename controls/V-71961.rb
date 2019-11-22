@@ -4,7 +4,7 @@
 grub_superusers = input(
   'grub_superusers',
   description: 'superusers for grub boot ( array )',
-  value: ['root']
+  value: ['root','bootuser']
 )
 grub_user_boot_files = input(
  'grub_user_boot_files',
@@ -74,19 +74,19 @@ commands:
 # grub2-mkconfig --output=/tmp/grub2.cfg
 # mv /tmp/grub2.cfg /boot/grub2/grub.cfg
 "
-  tag "fix_id": "F-78313r2_fix"
-  describe file(grub_main_cfg) do
-    its('content') { should match %r{^\s*password_pbkdf2\s+root } }
+ tag "fix_id": "F-78313r2_fix"
+  describe.one do
+    grub_superusers.each do |user|
+       describe file(grub_main_cfg) do
+         its('content') { should match %r{^\s*password_pbkdf2\s+#{user} } }
+       end
+    end
   end
 
   grub_user_boot_files.each do |user_cfg_file|
     next if !file(user_cfg_file).exist?
-    describe.one do
-      grub_superusers.each do |user|
-        describe file(user_cfg_file) do
-          its('content') { should match %r{^\s*password_pbkdf2\s+#{user} } }
-        end
-      end
+    describe file(user_cfg_file) do
+      its('content') { should match %r{^GRUB2_PASSWORD\=grub\.pbkdf2\.sha512} }
     end
   end
 end

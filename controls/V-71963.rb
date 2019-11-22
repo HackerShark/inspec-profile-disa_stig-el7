@@ -4,7 +4,7 @@
 efi_superusers = input(
   'efi_superusers',
   description: 'superusers for efi boot ( array )',
-  value: ['root']
+  value: ['root','bootuser']
 )
 efi_user_boot_files = input(
  'efi_user_boot_files',
@@ -75,18 +75,33 @@ commands:
 # mv /tmp/grub2.cfg /boot/efi/EFI/redhat/grub.cfg
 "
   tag "fix_id": "F-78315r2_fix"
-  describe file(efi_main_cfg) do
-    its('content') { should match %r{^\s*password_pbkdf2\s+root } }
+#   describe file(efi_main_cfg) do
+#     its('content') { should match %r{^\s*password_pbkdf2\s+root } }
+#   end
+
+#   efi_user_boot_files.each do |user_cfg_file|
+#     next if !file(user_cfg_file).exist?
+#     describe.one do
+#       efi_superusers.each do |user|
+#         describe file(user_cfg_file) do
+#           its('content') { should match %r{^\s*password_pbkdf2\s+#{user} } }
+#         end
+#       end
+#     end
+#   end
+# end
+  describe.one do
+    efi_superusers.each do |user|
+       describe file(efi_main_cfg) do
+         its('content') { should match %r{^\s*password_pbkdf2\s+#{user} } }
+       end
+    end
   end
 
   efi_user_boot_files.each do |user_cfg_file|
     next if !file(user_cfg_file).exist?
-    describe.one do
-      efi_superusers.each do |user|
-        describe file(user_cfg_file) do
-          its('content') { should match %r{^\s*password_pbkdf2\s+#{user} } }
-        end
-      end
+    describe file(user_cfg_file) do
+      its('content') { should match %r{^GRUB2_PASSWORD\=grub\.pbkdf2\.sha512} }
     end
   end
 end
